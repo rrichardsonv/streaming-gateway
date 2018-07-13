@@ -1,0 +1,1 @@
+const videoController = require('../controller');

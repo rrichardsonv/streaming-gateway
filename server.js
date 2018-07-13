@@ -1,42 +1,19 @@
 'use strict';
 
 const express = require('express');
-const SocketServer = require('ws').Server;
-const path = require('path');
-const fs = require('fs');
 const cors = require('cors');
 const app = express();
+const routes = require('./routes');
 
-app.use(cors());
+const contentSecurityPolicyMiddleware = function(req, res, next) {
+  res.setHeader('Content-Security-Policy', "media-src 'self' http://localhost:8000");
+  return next();
+};
 
-app.get('/video/:id', function(req, res) {
-  const path = `assets/${req.params.id}.mp4`;
-  const stat = fs.statSync(path);
-  const fileSize = stat.size;
-  const range = req.headers.range;
+app.use(cors({ origin: ['http://localhost:3000', 'http://localhost:8000'] }));
+app.use(contentSecurityPolicyMiddleware);
+app.use(routes);
 
-  if (range) {
-    const parts = range.replace(/bytes=/, '').split('-');
-    const start = parseInt(parts[0], 10);
-    const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1;
-    const chunksize = end - start + 1;
-    const file = fs.createReadStream(path, { start, end });
-    const head = {
-      'Content-Range': `bytes ${start}-${end}/${fileSize}`,
-      'Accept-Ranges': 'bytes',
-      'Content-Length': chunksize,
-      'Content-Type': 'video/mp4',
-    };
-    // Partial content for initial
-    res.writeHead(206, head);
-    file.pipe(res);
-  } else {
-    const head = {
-      'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
-    };
-    // Then the rest
-    res.writeHead(200, head);
-    fs.createReadStream(path).pipe(res);
-  }
+app.listen(6001, function() {
+  console.log('Simple server started on port 6001');
 });

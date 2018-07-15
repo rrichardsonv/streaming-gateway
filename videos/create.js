@@ -8,7 +8,7 @@ const getFileName = function() {
 };
 
 module.exports = function(req, res) {
-  console.log(req.socket.read());
+  // fs.createWriteStream()
   // const fileName = getFileName();
   // fs.writeFileSync(fileName, '');
   // const writeStream = fs.createWriteStream(fileName);

@@ -18,7 +18,8 @@
   "homepage": "https://github.com/rrichardsonv/streaming-gateway#readme",
   "dependencies": {
     "cors": "^2.8.4",
-    "express": "^4.16.3"
+    "express": "^4.16.3",
+    "socket.io": "^2.1.1"
   },
   "prettier": {
     "printWidth": 100,

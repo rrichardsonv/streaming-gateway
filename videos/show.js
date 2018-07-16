@@ -1,8 +1,8 @@
 const fs = require('fs');
+const utilities = require('../utilities');
 
 module.exports = function(req, res) {
-  const path = `assets/videos/${req.params.id}.mp4`;
-  const stat = fs.statSync(path);
+  const stat = fs.statSync(utilities.getVideoPath(req.params.id));
   const fileSize = stat.size;
   const range = req.headers.range;
 
@@ -16,7 +16,7 @@ module.exports = function(req, res) {
       'Content-Range': `bytes ${start}-${end}/${fileSize}`,
       'Accept-Ranges': 'bytes',
       'Content-Length': chunksize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': 'video/webv',
     };
     // Partial content for initial
     res.writeHead(206, head);
@@ -24,7 +24,7 @@ module.exports = function(req, res) {
   } else {
     const head = {
       'Content-Length': fileSize,
-      'Content-Type': 'video/mp4',
+      'Content-Type': 'video/webv',
     };
     // Then the rest
     res.writeHead(200, head);

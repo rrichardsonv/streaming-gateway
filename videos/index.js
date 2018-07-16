@@ -5,13 +5,17 @@ getLines = string => {
   return string
     .split('\n')
     .map(l => l.split(','))
-    .map(([id, type, duration]) => ({
-      id,
-      type,
-      duration,
-      thumb_url: utilities.getThumbUrl(id),
-      video_url: utilities.getVideoUrl(id),
-    }));
+    .map(
+      ([id, type, duration]) =>
+        type === 'video' && {
+          id,
+          type,
+          duration,
+          thumb_url: utilities.getThumbUrl(id),
+          video_url: utilities.getVideoUrl(id),
+        }
+    )
+    .filter(v => !!v);
 };
 
 module.exports = function(_, res) {

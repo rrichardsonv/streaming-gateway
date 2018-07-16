@@ -2,7 +2,8 @@ const fs = require('fs');
 const utilities = require('../utilities');
 
 module.exports = function(req, res) {
-  const stat = fs.statSync(utilities.getVideoPath(req.params.id));
+  const path = utilities.getVideoPath(req.params.id);
+  const stat = fs.statSync(path);
   const fileSize = stat.size;
   const range = req.headers.range;
 

@@ -4,45 +4,58 @@ const utilities = require('../utilities');
 function createFile(filePath) {
   try {
     fs.createWriteStream(filePath).end();
+    return true;
   } catch (err) {
     console.error('error in createFile for', filePath);
-    throw err;
+    return false;
   }
 }
 
 function handleUploadStart(msg) {
-  const vidFile = createFile(utilities.getFilePath(msg.name));
-  const metaFile = createFile(utilities.getMetaDataPath(msg.name));
-  // const thumbFile = createFile(utilities.getThumbPath(msg.name));
+  const assetFile = createFile(utilities.getFilePath(msg.name, msg.fileType));
+  let metaFile = null;
+  if (!msg.noMeta) {
+    metaFile = createFile(utilities.getMetaDataPath(msg.name));
+  }
 
-  if (!vidFile) {
-    console.error('video file not created');
+  if (!assetFile) {
+    console.error(`${msg.fileType} file not created`);
     return false;
   }
 
   if (!metaFile) {
-    console.warn('metadata file not created');
+    console.log('metadata file not created');
   }
 
   return true;
 }
 
 function handleUploading(msg) {
-  fs.appendFile(utilities.getVideoPath(msg.name), new Buffer(msg.data), function(err) {
+  console.log(Object.keys(msg));
+  const filePath = utilities.getFilePath(msg.name, msg.fileType);
+  console.log(filePath);
+  console.log(typeof filePath);
+  fs.appendFile(filePath, new Buffer(msg.data), function(err) {
     console.error(err);
   });
 
-  fs.appendFile((utilities.getMetaDataPath(msg.name), msg.metaData), function(err) {
-    console.error(err);
-  });
+  if (!msg.noMeta) {
+    fs.appendFile(utilities.getMetaDataPath(msg.name), msg.metaData, function(err) {
+      console.error(err);
+    });
+  }
 }
 
 function handleUploadEnd(msg) {
-  fs.appendFile(utilities.getAssetManifest(), `${[msg.name, msg.duration].join(',')}\n`, function(
-    err
-  ) {
-    console.error(err);
-  });
+  if (!msg.notMeta) {
+    fs.appendFile(
+      utilities.getAssetManifest(),
+      `${[msg.name, msg.fileType, msg.duration].join(',')}\n`,
+      function(err) {
+        console.error(err);
+      }
+    );
+  }
   console.log('upload finished');
 }
 

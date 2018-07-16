@@ -18,7 +18,7 @@ const io = socketIO();
 io.serveClient(false);
 io.attach(http);
 
-app.use(cors({ origin: ['*'] }));
+app.use(cors({ origin: ['*', 'http://localhost:3000'] }));
 app.use(middleware.contentSecurityPolicy);
 app.use(middleware.requestLogging);
 
